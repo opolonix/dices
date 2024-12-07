@@ -31,6 +31,14 @@ class Client(db.Model):
     balance: int = Column(Integer, default=500)
     wallet: str = Column(String(253), default=None)
 
+class ClientReferral(db.Model):
+    __tablename__ = 'client_referral'
+
+    id: int = Column(Integer, primary_key=True, autoincrement=True)
+    path: str = Column(String(16), default=lambda: ''.join(random.choices(string.ascii_letters, k=9)))
+    client_id: int = Column(Integer, ForeignKey(Client.id))
+
+
 class DiceModel(db.Model):
     __tablename__ = 'model_dice'
 
