@@ -5,7 +5,7 @@ from multiprocessing import Process
 def web():
     subprocess.run([
         "venv/bin/gunicorn",
-        "-w", "4",
+        "-w", "1",
         "-b", f"127.0.0.1:{config['server']['port']}",
         "--reload",
         "--access-logfile", "-",
