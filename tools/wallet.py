@@ -6,6 +6,7 @@ from tonsdk.utils import Address
 
 import requests
 import base64
+import binascii
 import hashlib
 import time
 import traceback
@@ -19,7 +20,7 @@ NFT_API = 'https://tonapi.io/v2/accounts/{address}/nfts?offset=0&indirect_owners
 # NFT_API = 'https://tonapi.io/v2/accounts/{address}/nfts?collection={collection}&limit=1&offset=0&indirect_ownership=false'
 
 def collections(address):
-    response = requests.get(NFT_API.format(address=address))
+    response = requests.get(NFT_API.format(address=ton_address_to_base64url(address)))
     result = []
     hist = set()
 
@@ -39,7 +40,6 @@ def collections(address):
 
 
 def signature_verify(pubkey: bytes, message: bytes, signature: bytes) -> bool:
-    print(pubkey, message, signature)
     try:
         verify_key = VerifyKey(pubkey)
         verify_key.verify(message, signature)
@@ -113,3 +113,17 @@ def check_proof(address, ton_proof_req, payload):
         return signature_verify(bytes(pub_key), mes, ton_proof_req["signature"])
     except Exception as e:
         return False
+
+
+def ton_address_to_base64url(address: str) -> str:
+    workchain, address_hash = address.split(":")
+    
+    workchain_byte = int(workchain).to_bytes(1, byteorder='big', signed=True)
+    
+    address_bytes = binascii.unhexlify(address_hash)
+    
+    full_address = workchain_byte + address_bytes
+
+    base64url_address = base64.urlsafe_b64encode(full_address).rstrip(b'=').decode('utf-8')
+    
+    return base64url_address
