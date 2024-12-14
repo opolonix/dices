@@ -20,7 +20,7 @@ NFT_API = 'https://tonapi.io/v2/accounts/{address}/nfts?offset=0&indirect_owners
 # NFT_API = 'https://tonapi.io/v2/accounts/{address}/nfts?collection={collection}&limit=1&offset=0&indirect_ownership=false'
 
 def collections(address):
-    response = requests.get(NFT_API.format(address=ton_address_to_base64url(address)))
+    response = requests.get(NFT_API.format(address=address))
     result = []
     hist = set()
 
