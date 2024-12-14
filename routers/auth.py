@@ -1,6 +1,7 @@
 from flask import Blueprint, request, render_template
 
 from db import session, Client
+from tools.wallet import check_proof, convert_ton_proof_message
 
 from tools.funcs import get_auth_data, resp
 from tools.config import config
@@ -78,16 +79,39 @@ def tgAuth():
 def setWallet():
 
     client_id, is_admin = get_auth_data(request)
-    data = json.loads(request.data)
+    wallet = json.loads(request.data)
 
-    if client_id:
-        if data.get("address") and session.query(Client).filter(Client.wallet == data.get("address")).first():
-            return resp(None, "Кошелек уже привязан")
+    if not client_id:
+        return resp(descr="Пользователь не найден", status=401)
 
-        client = session.query(Client).filter(Client.telegram_id == client_id).first()
-        client.wallet = data.get("address")
-        session.commit()
+    address = wallet.get('account', {}).get('address', '')
 
-        return resp(None, "Кошелек успешно привязан")
-    
-    return resp(None, "Пользователь не найден", False, 400)
+    # проверка кошелька, не сходится в check_proof на последней строчке при проверке сигнатуры
+    # parsed = convert_ton_proof_message(wallet)
+    # flag = check_proof(address, parsed, str(client_id))
+
+    # if not flag:
+    #     return resp(descr="Ошибка при проверке кошелька", status=500)
+
+    if session.query(Client).filter(Client.wallet == address).first():
+        return resp(descr="Кошелек уже привязан", status=400)
+
+    client = session.query(Client).filter(Client.telegram_id == client_id).first()
+    client.wallet = address
+    session.commit()
+
+    return resp(descr="Кошелек успешно привязан")
+
+@router.route('/wallet/disconnect', methods=['POST'])
+def disconnectWallet():
+
+    client_id, is_admin = get_auth_data(request)
+
+    if not client_id:
+        return resp(descr="Пользователь не найден", status=401)
+
+    client = session.query(Client).filter(Client.telegram_id == client_id).first()
+    client.wallet = None
+    session.commit()
+
+    return resp(descr="Кошелек отвязан")

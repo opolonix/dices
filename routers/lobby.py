@@ -51,7 +51,7 @@ def lobbyPage():
     if not room: 
         t = env.get_template("error.html")
         return render_template(t, message="Похоже комната уже закрылась!")
-    
+
     if room.stage == 2: return redirect(f"/game?{room_key}")
     if room.stage == 3: return redirect(f"/results?{room_key}")
 
