@@ -14,9 +14,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = config['server']['db']
 
 db.init_app(app)
 
-from . import auth, errors, game_api, game, index, lobby, results, static
+from . import auth, errors, game_api, game, index, lobby, results, static, bonus
 
 app.register_blueprint(index.router, url_prefix='/')
+app.register_blueprint(bonus.router, url_prefix='/')
 app.register_blueprint(static.router, url_prefix='/')
 
 app.register_blueprint(auth.router, url_prefix='/auth')

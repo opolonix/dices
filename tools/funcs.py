@@ -2,7 +2,10 @@ from db import Dice, Client, Room, Player, session
 from flask import Request, make_response, Response, request
 from tools.config import config
 import itertools, json, time, jwt
+from datetime import datetime
 
+def datetimeToInt(dt: datetime) -> int:
+    return int(dt.timestamp())
 
 def resp(data: dict = None, descr = None, status = 200):
     out = {"ok": status == 200}

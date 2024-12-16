@@ -30,6 +30,7 @@ class Client(db.Model):
     banned: bool = Column(Boolean, default=False)
     balance: int = Column(Integer, default=500)
     wallet: str = Column(String(253), default=None)
+    daily_reward_date: datetime = Column(DateTime, default=lambda: datetime.now() + timedelta(days=1))
 
 class ClientReferral(db.Model):
     __tablename__ = 'client_referral'

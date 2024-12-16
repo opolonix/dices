@@ -2,7 +2,7 @@ from flask import redirect, request, render_template, Blueprint
 from sqlalchemy import or_
 from db import session, Client, Player, DiceModel, ClientDice
 
-from tools.funcs import get_auth_data, resp
+from tools.funcs import get_auth_data, resp, datetimeToInt
 from tools.template import env
 from tools.wallet import collections
 
@@ -44,7 +44,7 @@ def index():
         return redirect(f"/lobby?{player.room.room_key}")
 
     t = env.get_template("index.html")
-    return render_template(t, client=client, models=allowed_models)
+    return render_template(t, client=client, models=allowed_models, datetimeToInt=datetimeToInt)
 
 @router.route("/setDice", methods=["POST"])
 def setDice():
